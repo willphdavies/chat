@@ -1,4 +1,5 @@
 var express = require('express');
+var jwt = require('express-jwt');
 var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
@@ -25,7 +26,6 @@ app.use(function(req,res,next){
 });
 
 
-
 app.get('/', function(req, res){
     var collection = db.get('msgs');
     collection.find({},{},function(e,docs){
@@ -33,6 +33,9 @@ app.get('/', function(req, res){
     });
 });
 
+app.get('/login',function(req,res){
+    res.render('login');
+});
 io.on('connection', function(socket){
     socket.on('chat message', function(msg){
         var collection = db.get('msgs');
