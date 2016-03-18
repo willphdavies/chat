@@ -6,7 +6,6 @@ var io = require('socket.io')(http);
 var path = require('path');
 var bodyParser  = require('body-parser');
 var methodOverride = require('method-override');
-var db = require('mongodb');
 
 app.set('views', path.join(__dirname,'views'));
 app.set('view engine', 'jade');
@@ -20,22 +19,35 @@ var mongo = require('mongodb');
 var monk = require('monk');
 var db = monk('localhost:27017/chat');
 
-// Make our db accessible to our router
-app.use(function(req,res,next){
+app.locals = require('./config.json');
+
+app.all('',function(req,res,next){
+    req.db = db;
     next();
 });
-
 
 app.get('/', function(req, res){
     var collection = db.get('msgs');
     collection.find({},{},function(e,docs){
-        res.render('index',{msgs: docs});
+        res.render('index',{msgs: docs,page: 'index'});
     });
 });
 
-app.get('/login',function(req,res){
-    res.render('login');
+app.all('/:page',function(req, res){
+    var page = req.params.page;
+    var result = require('./application/'+page)(req) || {};
+    if (result.redirect){
+        res.redirect(result.redirect);
+    } else if (result.view) {
+        res.render(result.view,result);
+    } else if (result.json) {
+        res.json(result.json);
+    } else {
+        res.render(page,{page: page});
+    }
 });
+
+
 io.on('connection', function(socket){
     socket.on('chat message', function(msg){
         var collection = db.get('msgs');

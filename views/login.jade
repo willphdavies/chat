@@ -1,11 +1,20 @@
-form
-    .form-group
-        .input-group
-            .input-group-addon
-                i.fa.fa-user
-            input.form-control(name="username",type="email")
-    .form-control
-        .input-group
-            .input-group-addon
-                i.fa.fa-lock
-            input.form-control(name="password",type="password")
+extends html
+block content
+    div(ng-controller="LoginCtrl")
+        form(name="loginFrm",ng-submit="submit")
+            .form-group
+                .input-group
+                    .input-group-addon
+                        i.fa.fa-user
+                    input.form-control(name="username",type="email",ng-model="login.username")
+            .form-group
+                .input-group
+                    .input-group-addon
+                        i.fa.fa-lock
+                    input.form-control(name="password",type="password",ng-model="login.password")
+            .row
+                .col-xs-12
+                    input.btn.btn-primary.center-block(value="Login",type="submit")
+block scripts
+    script(src="assets/vendor/angular-local-storage/dist/angular-local-storage.min.js")
+    script(src="assets/js/" + page + ".js")

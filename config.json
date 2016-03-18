@@ -1,0 +1,10 @@
+{
+  "meta": {
+    "title": "Socket.io Chat Application",
+    "description": "An application to chat with people"
+  },
+  "sessionTimeout": 1,
+  "angularConfig": {
+    "cookieTimeOut": 1
+  }
+}
