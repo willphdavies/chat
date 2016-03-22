@@ -1,29 +1,25 @@
 extends html
 block content
-    div.row(ng-controller="LoginCtrl")
+    div.row(ng-controller="RegisterCtrl")
         .col-xs-4.col-xs-offset-4
-            form(name="loginFrm",ng-submit="submit()")
+            form(name="registerFrm",ng-submit="submit()")
                 br
                 br
-                h1.text-center Welcome to SockChat
+                h1.text-center Register for SockChat
                 .form-group
                     .input-group
                         .input-group-addon
                             i.fa.fa-user
-                        input.form-control(name="username",type="email",ng-model="login.username")
+                        input.form-control(name="username",type="email",ng-model="register.username")
                 .form-group
                     .input-group
                         .input-group-addon
                             i.fa.fa-lock
-                        input.form-control(name="password",type="password",ng-model="login.password")
+                        input.form-control(name="password",type="password",ng-model="register.password")
                 .row
                     .col-xs-12
-                        input.btn.btn-primary.btn-lg.btn-block(value="Login",type="submit")
+                        input.btn.btn-primary.btn-lg.btn-block(value="Register",type="submit")
                 br
-                br
-                .row
-                    .col-xs-12
-                        a.btn.btn-success.btn-lg.center-block(href="/register") Register
 block scripts
     script(src="assets/vendor/angular-local-storage/dist/angular-local-storage.min.js")
     script(src="assets/js/" + page + ".js")

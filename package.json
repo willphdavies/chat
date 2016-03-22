@@ -8,9 +8,13 @@
     "express-jwt": "^3.3.0",
     "grunt": "^0.4.5",
     "jade": "^1.11.0",
+    "jsonwebtoken": "^5.7.0",
     "method-override": "^2.3.5",
     "mongodb": "^2.1.7",
+    "mongoose": "^4.4.8",
     "monk": "^1.0.1",
+    "password-hash": "^1.2.2",
+    "q": "^1.4.1",
     "socket.io": "1.2.0"
   }
 }

@@ -15,19 +15,43 @@ app.use(methodOverride('X-HTTP-Method-Override'));
 app.enable('etag');
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.set('jwtSecret','here-is-my-secret-hahahahah');
+app.use(
+    jwt(
+        {
+            secret: app.get('jwtSecret'),
+            credentialsRequired: false,
+            getToken: function fromHeaderOrQuerystring (req) {
+                if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+                    return req.headers.authorization.split(' ')[1];
+                } else if (req.query && req.query.token) {
+                    return req.query.token;
+                } else if ( req.cookie.token ){
+                    return req.cookie.token;
+                }
+                return null;
+            }
+        }).unless({path: ['/login','/register']}));
+
 var mongo = require('mongodb');
 var monk = require('monk');
 var db = monk('localhost:27017/chat');
 
 app.locals = require('./config.json');
 
-app.all('',function(req,res,next){
+app.all('*',function(req,res,next){
     req.db = db;
     next();
 });
 
+app.use(function (err, req, res, next) {
+    if (err.name === 'UnauthorizedError') {
+        res.redirect('/login');
+    }
+});
+
 app.get('/', function(req, res){
-    var collection = db.get('msgs');
+    var collection = req.db.get('msgs');
     collection.find({},{},function(e,docs){
         res.render('index',{msgs: docs,page: 'index'});
     });
@@ -35,16 +59,35 @@ app.get('/', function(req, res){
 
 app.all('/:page',function(req, res){
     var page = req.params.page;
-    var result = require('./application/'+page)(req) || {};
-    if (result.redirect){
-        res.redirect(result.redirect);
-    } else if (result.view) {
-        res.render(result.view,result);
-    } else if (result.json) {
-        res.json(result.json);
+    var handler = require('./application/'+page)(app);
+
+    console.log(res.render(page, {page: page}).find({},{},function(e,docs){
+        console.log(docs);
+    }));
+    if (typeof handler[req.method.toLowerCase()] === 'function') {
+
+        var success = function (response) {
+            res.status(response.status ? response.status : 200);
+            if (response.redirect) {
+                res.redirect(response.redirect);
+            } else if (response.view) {
+                res.render(response.view, response);
+            } else if (response.json) {
+                res.json(response.json);
+            } else {
+                res.render(page, {page: page});
+            }
+        };
+
+        var failure = function (response) {
+            console.log('fail');
+        };
+        handler(req).then(success, failure);
+
     } else {
-        res.render(page,{page: page});
+        res.render(page, {page: page});
     }
+
 });
 
 
